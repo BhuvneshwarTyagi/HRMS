@@ -1,7 +1,8 @@
 import { createBrowserRouter } from "react-router-dom";
 import React, { Suspense,lazy } from "react";
-import PayrollScreen from "./EmployeePanel/PayrollCreate.jsx";
-import PayrollDashboard from "./EmployeePanel/SelfPayroll.jsx";
+
+const PayrollScreen = lazy(() => import("./EmployeePanel/PayrollCreate.jsx"));
+const PayrollDashboard = lazy(() => import("./EmployeePanel/SelfPayroll.jsx"));
 
 const AttendanceScreen = lazy(() => import("./EmployeePanel/AttendanceScreen.jsx"));
 const Login = lazy(() => import("./EmployeePanel/Login/Login.jsx"));
@@ -52,48 +53,12 @@ const router = createBrowserRouter([
       { path: "attendance", element: <SuspenseWrapper><AttendanceScreen /></SuspenseWrapper> },
       { path: "employee-payroll", element: <SuspenseWrapper><PayrollScreen /></SuspenseWrapper> },
       { path: "payroll", element: <SuspenseWrapper><PayrollDashboard /></SuspenseWrapper> },
-
-
-
-
-
     ],
   },
-  // {
-  //   path: "/HR-Dashboard",
-  //   element: (
-  //     <PrivateRoute>
-  //       <Dashboard />
-  //     </PrivateRoute>
-  //   ),
-  //   children: [
-  //     {
-  //       path: "",
-  //       element: <Home />,
-  //     },
-  //     {
-  //       path: "profile",
-  //       element: <ProfileRoute />,
-  //     },
-  //     {
-  //       path: "home",
-  //       element: <Home />,
-  //     },
-  //     {
-  //       path: "employees",
-  //       element: <a />,
-  //     },
-  //     {
-  //       path: "leave",
-  //       element: <Leave />,
-  //     },
-
-  //   ]
-  // },
-
-
-
-
+  {
+    path: "*",
+    element: <SuspenseWrapper><UserProfile /></SuspenseWrapper>,
+  },
 
 ]);
 
