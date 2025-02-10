@@ -8,6 +8,8 @@ const update = require('./updateEmployees');
 const fetch = require('./fetchEmployees');
 const attendance = require('./CheckInOut/index');
 const payroll = require('./Payroll/index');
+const searchUser = require('./searchUser');
+
 
 
 
@@ -22,6 +24,8 @@ router.use('/update',update);
 router.use('/fetch',fetch);
 router.use('/attendance',attendance);
 router.use('/payroll',payroll);
+router.use('/searchUser',searchUser);
+
 
 
 
