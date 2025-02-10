@@ -5,7 +5,7 @@ const { check, extractToken } = require("../../../Middleware/auth");
 const { EmployeeModel, LeaveModel } = require("../../../Schemas/model");
 
 router.post("", extractToken,check, async (req, res) => {
-    console.log("here");
+
    
         try {
             const startDate = req.body.startDate;

@@ -176,12 +176,9 @@ function NewLeave({ onClose, onNewLeave }) {
                   required
                 >
                   <option value="">Select Type</option>
-                  <option value="Medical Leave">Medical Leave (ML)</option>
+                  <option value="Sick Leave">Sick Leave (SL)</option>
                   <option value="Casual Leave">Casual Leave (CL)</option>
-                  <option value="Complementry Off">Complementry Off (CO)</option>
-                  <option value="Duty Leave">Duty Leave (DL)</option>
-                  <option value="Restricted">Restricted (RH)</option>
-                  <option value="Maternity">Maternity (MTR)</option>
+                  <option value="Earned Leave">Earned Leave (EL)</option>
                 </select>
               </div>
             </div>

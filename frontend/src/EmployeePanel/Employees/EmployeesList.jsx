@@ -43,7 +43,7 @@ const UserManagement = () => {
             });
 
             // Remove user from local state
-            setUsers(users.filter(user => user.id !== userId));
+            setUsers(users.filter(user => user._id !== userId));
 
             // Optional: Show success toast
             alert('User deleted successfully');
@@ -57,7 +57,7 @@ const UserManagement = () => {
     const handleSave = async () => {
         try {
             // Replace with your actual API endpoint
-            const response = await axios.put(BASE_URL + `/update/user/${editingUser.id}`, editingUser, {
+            const response = await axios.put(BASE_URL + `/update/user/${editingUser._id}`, editingUser, {
                 headers: {
                     'Authorization': `Bearer ${authState.accessToken}`,
                 },
@@ -65,7 +65,7 @@ const UserManagement = () => {
 
             // Update local state
             setUsers(users.map(user =>
-                user.id === editingUser.id ? response.data : user
+                user._id === editingUser._id ? editingUser : user
             ));
 
             // Close modal
@@ -82,10 +82,19 @@ const UserManagement = () => {
     // Handle input changes in edit modal
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setEditingUser(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        if(name === 'isHR'){
+            setEditingUser(prev => ({
+                ...prev,
+                HR: !prev.HR
+            }));
+        }else{
+            setEditingUser(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
+
+      
     };
 
     // Render loading state
@@ -108,27 +117,43 @@ const UserManagement = () => {
     }
 
     return (
-        <div className="container mx-auto p-6">
-            <h1 className="text-2xl font-bold mb-4">User Management</h1>
+        <div className="container mx-auto  overflow-auto">
+            <h1 className="tablet:text-2xl mobile:text-xl overflow-auto font-bold mb-4">User Management</h1>
 
             {/* Users Table */}
-            <div className="overflow-x-auto">
-                <table className="w-full border-collapse border border-gray-300">
-                    <thead className="bg-gray-100">
+            <div className="overflow-x-auto rounded-xl">
+                <table className="w-full border-collapse border border-gray-300 ">
+                    <thead className="bg-gradient-to-r from-blue-500 to-blue-400 text-white">
                         <tr>
-                            <th className="border p-2">Name</th>
-                            <th className="border p-2">Email</th>
-                            <th className="border p-2">Contact</th>
-                            <th className="border p-2">Actions</th>
+                            <th className="border tablet:p-2 mobile:p-1">Name</th>
+                            <th className="border tablet:p-2 mobile:p-1">Email</th>
+                            <th className="border tablet:p-2 mobile:p-1">Contact</th>
+
+                            <th className="border tablet:p-2 mobile:p-1">Aadhaar</th>
+                            <th className="border tablet:p-2 mobile:p-1">PAN</th>
+                            <th className="border tablet:p-2 mobile:p-1">Bank Details</th>
+                            <th className="border tablet:p-2 mobile:p-1">Emergency Contanct</th>
+                            <th className="border tablet:p-2 mobile:p-1">Address</th>
+                            <th className="border tablet:p-2 mobile:p-1">Type</th>
+
+                            <th className="border tablet:p-2 mobile:p-1">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {users.map((user) => (
-                            <tr key={user.id} className="hover:bg-gray-50">
-                                <td className="border p-2">{user.Name}</td>
-                                <td className="border p-2">{user.email}</td>
-                                <td className="border p-2">{user.contact}</td>
-                                <td className="border p-2 text-center">
+                            <tr key={user.id} className="hover:bg-gray-50 bg-white">
+                                <td className="border tablet:p-2  mobile:p-1">{user.Name}</td>
+                                <td className="border tablet:p-2  mobile:p-1">{user.email}</td>
+                                <td className="border tablet:p-2  mobile:p-1">{user.contact}</td>
+
+                                <td className="border tablet:p-2  mobile:p-1">{user.Aadhaar}</td>
+                                <td className="border tablet:p-2  mobile:p-1">{user.PAN}</td>
+                                <td className="border tablet:p-2  mobile:p-1">{user.bank_details}</td>
+                                <td className="border tablet:p-2  mobile:p-1">{user.emergency_contact}</td>
+                                <td className="border tablet:p-2  mobile:p-1">{user.address}</td>
+                                <td className="border tablet:p-2  mobile:p-1">{user.HR ? 'HR' : "Employee"}</td>
+
+                                <td className="border tablet:p-2  mobile:p-1 text-center">
                                     <div className="flex justify-center space-x-2">
                                         <button
                                             onClick={() => setEditingUser(user)}
@@ -152,16 +177,34 @@ const UserManagement = () => {
 
             {/* Edit Modal */}
             {editingUser && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                    <div className="bg-white p-6 rounded-lg w-96 max-w-full">
+                <div className="fixed inset-0 py-6 bg-black bg-opacity-50 flex justify-center items-center z-50 overflow-auto">
+                    <div className="bg-white p-6 h-5/6 rounded-lg overflow-auto w-96 max-w-full">
                         <h2 className="text-xl font-bold mb-4">Edit User</h2>
 
                         {/* Dynamic Form Fields */}
                         {Object.keys(editingUser)
                             .filter(key =>
-                                !['id', 'profile_picture', 'HR'].includes(key)
+                                !['_id'].includes(key)
                             )
                             .map((key) => (
+                                key === 'HR'?
+                                <div className='flex justify-between items-center mb-4' key={key}>
+                                <span>
+                                HR
+                                </span>
+                                <label className="relative inline-flex items-center cursor-pointer ">
+                                    
+                                <input
+                                  type="checkbox"
+                                  name="isHR"
+                                  checked={editingUser[key] || false}
+                                  onChange={handleInputChange}
+                                  className="sr-only peer"
+                                />
+                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                              </label>
+                                </div>
+                              :
                                 <div key={key} className="mb-4">
                                     <label className="block mb-2 capitalize">
                                         {key.replace('_', ' ')}

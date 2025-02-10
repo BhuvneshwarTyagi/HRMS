@@ -23,7 +23,7 @@ router.post("/employee",extractToken,checkHr, async (req, res) => {
       throw { message: "Invalid email entered" };
     }
     password = await hashdata(aadhaar,10);
-    console.log(req.body);
+
 
     const newUser = new EmployeeModel({
         Name: name,

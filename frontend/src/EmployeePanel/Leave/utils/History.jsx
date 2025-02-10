@@ -6,14 +6,13 @@ import Loading from '../../../LoadingScreen/Loading'
 import { toast } from 'react-toastify';
 import HistoryTile from './HistoryTile';
 import { motion } from 'framer-motion';
-import { FaHistory } from 'react-icons/fa';
 
 function History({ additionalData }) {
     const { authState } = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
     const [details, setDetails] = useState([]);
     const [start, setStart] = useState(0);
-    const end = useState(20);
+    const end = 20;
     const [allDataFetched, setAllDataFetched] = useState(false);
     const sentinelRef = useRef(null);
 
@@ -37,64 +36,49 @@ function History({ additionalData }) {
         }
     }
 
+
     useEffect(() => {
-        if (start === 0 && details.length === 0 && !allDataFetched && !loading) {
-            fetchLeaves();
-        }
-    }, [start, details, allDataFetched, loading]);
+        const fetchData = async () => {
+            if (loading || allDataFetched) return;
 
-    const handleViewMore = () => {
-        if (!allDataFetched && !loading) {
-            setStart((prevStart) => prevStart + end);
-        }
-    };
+            const session = getCurrentSession();
+            setLoading(true);
 
-    // useEffect(() => {
-    //     if (start !== 0) {
-    //         fetchLeaves();
-    //     }
-    // }, [start]);
+            try {
+                const response = await axios.get(
+                    `${BASE_URL}/leave/fetch/leave?start=${start}&end=${end}&session=${session}`,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${authState.accessToken}`
+                        }
+                    }
+                );
 
-    const fetchLeaves = async () => {
-        const session = getCurrentSession();
-        if (loading || allDataFetched) return;
+                const leaves = response.data.Leaves.length;
 
-        setLoading(true);
-        console.log('start', start, 'end', end)
-        try {
-            const response = await axios.get(`${BASE_URL}/leave/fetch/leave?start=${start}&end=${end}&session=${session}`, {
-                headers: {
-                    'Authorization': `Bearer ${authState.accessToken}`
+                if (leaves < end) {
+                    setAllDataFetched(true);
                 }
-            });
 
-            const leaves = response.data.Leaves.length;
-            console.log("API response:", response.data.Leaves);
-            if (leaves < end) {
-                toast.success('All data fetched');
-                console.log('All data fetched')
-                setAllDataFetched(true);
+                setDetails(prevData => [...prevData, ...response.data.Leaves]);
+            } catch (error) {
+                toast.error(error.message);
+            } finally {
+                setLoading(false);
             }
-            setDetails(prevData => [...prevData, ...response.data.Leaves]);
-            console.log("API responserrrrrr:", data);
+        };
 
+        if (authState.accessToken && !allDataFetched) {
+            fetchData();
+        }
+    }, [start, authState.accessToken, end]);
 
-        }
-        catch (error) {
-            toast.error(error);
-        }
-        finally {
-            setLoading(false)
-        }
-    }
 
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
                 if (entries[0].isIntersecting && !allDataFetched && !loading) {
-                    console.log("Fetching more data...");
-                    handleViewMore();
-
+                    setStart(prevStart => prevStart + end);
                 }
             },
             { root: null, rootMargin: '0px', threshold: 1.0 }
@@ -109,7 +93,7 @@ function History({ additionalData }) {
                 observer.unobserve(sentinelRef.current);
             }
         };
-    }, [allDataFetched, loading]);
+    }, [allDataFetched, loading, end]);
 
 
     return (
@@ -118,22 +102,10 @@ function History({ additionalData }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
 
-            className=' mx-auto   '
+            className=' mx-auto  w-full '
 
         >
-            <motion.div
-                className='flex items-center justify-between mb-6 mobile:max-tablet:mb-3'
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-            >
 
-                <h1 className='text-3xl px-2 mobile:max-tablet:text-lg font-medium text-black flex items-center'>
-
-                    <FaHistory className="mr-2" />
-                    Leave History
-                </h1>
-            </motion.div>
 
             {loading ? (
                 <motion.div

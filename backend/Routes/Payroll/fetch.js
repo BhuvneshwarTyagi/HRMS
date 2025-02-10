@@ -1,0 +1,180 @@
+const express = require("express");
+const router = express.Router();
+const { Payroll } = require("../../Schemas/model");
+const { extractToken, check, checkHr } = require("../../Middleware/auth");
+const PDFKit = require("pdfkit");
+
+
+router.get("", extractToken, check, async (req, res) => {
+  try {
+    const { month } = req.query;
+    const employeeId = req.id;
+    if (!employeeId || !month) {
+      return res.status(400).json({ message: "employeeId and month are required!" });
+    }
+
+    const payrollRecord = await Payroll.findOne({ employeeId, month }).populate('employeeId', 'Name');
+
+    if (!payrollRecord) {
+      return res.status(404).json({ message: "Payroll record not found!" });
+    }
+
+    res.status(200).json({ message: "Payroll fetched successfully!", data: payrollRecord });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+router.get("/employee", extractToken, checkHr, async (req, res) => {
+  try {
+
+    const payrollRecord = await Payroll.find({}).populate('employeeId', 'Name');
+
+    if (!payrollRecord) {
+      return res.status(404).json({ message: "Payroll record not found!" });
+    }
+
+    res.status(200).json({ message: "Payroll fetched successfully!", data: payrollRecord });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+
+router.get("/generate-pdf/:id", extractToken, checkHr, async (req, res) => {
+  try {
+    const payrollId = req.params.id;
+    
+    const payrollData = await Payroll.findById(payrollId)
+      .populate('employeeId', 'Name contact email Aadhaar PAN bank_details emergency_contact address profile_picture')
+      .populate('by', 'Name');
+
+    if (!payrollData) {
+      return res.status(404).json({ message: "Payroll record not found" });
+    }
+
+    const doc = new PDFKit({
+      size: 'A4',
+      margin: 50
+    });
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=payslip-${payrollData.employeeId.Name}-${payrollData.month}.pdf`);
+
+    doc.pipe(res);
+
+    doc.rect(0, 0, doc.page.width, doc.page.height)
+       .fill('#f8fafc');
+    
+    doc.rect(0, 0, doc.page.width, 150)
+       .fillOpacity(1)
+       .fill('#4299e1');
+
+    doc.fontSize(24)
+       .font('Helvetica-Bold')
+       .fillColor('#1a365d')
+       .text('COMPANY NAME', { align: 'center' });
+
+    doc.moveDown(0.5);
+    doc.fontSize(16)
+       .fillColor('#2d3748')
+       .text('Salary Slip', { align: 'center' });
+
+    doc.moveDown();
+    doc.fontSize(12)
+       .font('Helvetica')
+       .text(`Pay Period: ${payrollData.month}`, { align: 'center' });
+
+    doc.moveDown();
+    doc.lineWidth(1)
+       .strokeColor('#e2e8f0')
+       .moveTo(50, doc.y)
+       .lineTo(550, doc.y)
+       .stroke();
+
+    doc.moveDown();
+    doc.fontSize(14)
+       .font('Helvetica-Bold')
+       .fillColor('#2d3748')
+       .text('Employee Details');
+    doc.moveDown(0.5);
+
+    const employeeDetails = [
+      ['Name', payrollData.employeeId.Name],
+      ['Contact', payrollData.employeeId.contact],
+      ['Email', payrollData.employeeId.email],
+      ['Aadhaar Number', maskSensitiveData(payrollData.employeeId.Aadhaar)],
+      ['PAN', maskSensitiveData(payrollData.employeeId.PAN)],
+      ['Bank Details', maskSensitiveData(payrollData.employeeId.bank_details)],
+      ['Emergency Contact', payrollData.employeeId.emergency_contact],
+      ['Address', payrollData.employeeId.address]
+    ];
+
+    let startY = doc.y;
+    employeeDetails.forEach((detail) => {
+      doc.fontSize(10)
+         .font('Helvetica')
+         .fillColor('#4a5568')
+         .text(detail[0], 50, startY)
+         .font('Helvetica-Bold')
+         .text(detail[1], 250, startY);
+      
+      startY += 20;
+    });
+
+    doc.y = startY + 20;
+
+    doc.fontSize(14)
+       .font('Helvetica-Bold')
+       .fillColor('#2d3748')
+       .text('Salary Details');
+    doc.moveDown(0.5);
+
+    const salaryDetails = [
+      ['Basic Salary', `₹ ${payrollData.baseSalary.toFixed(2)}`],
+      ['Total Working Days', payrollData.totalDays],
+      ['Days Present', payrollData.presentDays],
+      ['Days Absent', payrollData.totalDays - payrollData.presentDays],
+      ['Attendance Percentage', `${((payrollData.presentDays/payrollData.totalDays) * 100).toFixed(2)}%`],
+      ['Net Payable Salary', `₹ ${payrollData.calculatedSalary.toFixed(2)}`]
+    ];
+
+    startY = doc.y;
+    salaryDetails.forEach((detail) => {
+      doc.fontSize(10)
+         .font('Helvetica')
+         .fillColor('#4a5568')
+         .text(detail[0], 50, startY)
+         .font('Helvetica-Bold')
+         .text(detail[1], 250, startY);
+      
+      startY += 20;
+    });
+
+    doc.fontSize(8)
+       .font('Helvetica')
+       .fillColor('#718096')
+       .text('This is a computer-generated document and does not require a physical signature.', 50, 700, {
+         align: 'center'
+       });
+
+    doc.moveDown();
+    doc.fontSize(8)
+       .text(`Generated by: ${payrollData.by.Name}`, { align: 'right' })
+       .text(`Generated on: ${new Date().toLocaleString()}`, { align: 'right' });
+
+    doc.end();
+
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+function maskSensitiveData(data) {
+  if (!data) return '';
+  const visibleChars = Math.min(4, data.length);
+  const maskLength = Math.max(0, data.length - visibleChars);
+  return '•'.repeat(maskLength) + data.slice(-visibleChars);
+}
+
+module.exports = router;

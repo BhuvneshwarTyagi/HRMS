@@ -1,40 +1,59 @@
-import { FaUserPlus, FaUsers, FaUserGraduate, FaMoneyBillWave, FaWallet } from "react-icons/fa";
-import { MdAssignmentLate, MdTrendingUp, MdPayments, MdHistory } from "react-icons/md";
-import { IoIosListBox } from "react-icons/io";
-import { IoSchool } from "react-icons/io5";
-import { RiMoneyDollarCircleLine, RiMoneyDollarCircleFill } from "react-icons/ri";
-import { GiReceiveMoney, GiTakeMyMoney } from "react-icons/gi";
+import { FaUserPlus } from "react-icons/fa";
+import { MdEventAvailable, MdOutlineFactCheck, MdOutlineDashboard } from "react-icons/md";
+import { IoMdTime } from "react-icons/io";
+import { RiMoneyDollarBoxLine, RiTeamFill } from "react-icons/ri";
+
 
 const menuItems = [
   {
     icon: FaUserPlus,
-    alt: "Student registration icon",
+    alt: "Register New Employee",
     title: "Register New Employee",
     route: "/dashboard/Employee-Registration",
     children: [],
   },
   {
-    icon: FaUserGraduate,
-    alt: "Agent registration icon",
-    title: "Take a leave",
-    route: "/dashboard/leave",
-    children: [],
-  },
-  {
-    icon: FaUsers,
-    alt: "Agent list icon",
+    icon: RiTeamFill,
+    alt: "View All Employees",
     title: "View All Employees",
     route: "/dashboard/employees",
     children: [],
   },
   {
-    icon: FaUsers,
-    alt: "Agent list icon",
-    title: "View Employees Leaves",
+    icon: MdEventAvailable,
+    alt: "Take a Leave",
+    title: "Take a Leave",
+    route: "/dashboard/leave",
+    children: [],
+  },
+  {
+    icon: MdOutlineFactCheck,
+    alt: "View Employee Leaves",
+    title: "View Employee Leaves",
     route: "/dashboard/employeesLeaves",
     children: [],
   },
-
+  {
+    icon: IoMdTime,
+    alt: "Attendance",
+    title: "Attendance",
+    route: "/dashboard/attendance",
+    children: [],
+  },
+  {
+    icon: RiMoneyDollarBoxLine,
+    alt: "Employee Payroll",
+    title: "Employee Payroll",
+    route: "/dashboard/employee-payroll",
+    children: [],
+  },
+  {
+    icon: MdOutlineDashboard,
+    alt: "Payroll Dashboard",
+    title: "Payroll Dashboard",
+    route: "/dashboard/payroll",
+    children: [],
+  },
 ];
 
 export default menuItems;

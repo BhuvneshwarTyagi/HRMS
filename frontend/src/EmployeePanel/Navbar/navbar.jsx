@@ -37,14 +37,17 @@ export default function Navbar({ onDrawerToggle }) {
                 </div>
                 <h1 className="text-2xl font-bold mobile:max-tablet:font-normal">Employee Panel</h1>
                 <div className="flex items-center space-x-4">
-                    <div className="relative" ref={dropdownRef}>
+                    <div className="relative text-black" ref={dropdownRef}>
                         <button
                             onClick={toggleDropdown}
-                            className="flex items-center space-x-4 focus:outline-none"
+                            className="flex items-center space-x-4 cursor-pointer"
                         >
                             <span className="flex items-center gap-2 font-medium">
-                                {authState.userDetails.name}
-                                <FaUserCircle className="text-3xl" />
+                            <div className="flex items-center justify-center  rounded-full bg-white p-[1px] shadow-lg ">
+                                    <img className="text-5xl text-blue-500 rounded-full h-10 w-10" alt='img' src={`${authState.userDetails.profile_picture}`} />
+                                </div>
+                                {authState.userDetails.Name}
+                                
                             </span>
                         </button>
                         {isOpen && (

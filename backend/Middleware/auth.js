@@ -7,11 +7,11 @@ const {
 } = require("../env");
 
 const verifyAccessToken = (token) => {
-  //checking for provided token
+
   if (!token) {
     return { valid: false, port: "401" };
   }
-  // verify token
+
   return jwt.verify(token, ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) {
       return { valid: false, port: "401" };
@@ -22,23 +22,18 @@ const verifyAccessToken = (token) => {
 };
 
 const refreshAccessToken = (refreshToken) => {
-  //checking for provided token
 
-  // verify token
   return jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, decoded) => {
     if (err) {
       throw "Invalid refresh token";
     }
 
-    // Check if the refresh token is associated with a valid user (in real-world scenario, you might check a database)
     delete decoded.iat;
     delete decoded.exp;
-    // Generate a new access token
     const accessToken = jwt.sign(decoded, ACCESS_TOKEN_SECRET, {
       expiresIn: Access_Expiry,
     });
 
-    // Respond with the new access token
     return { token: accessToken };
   });
 };

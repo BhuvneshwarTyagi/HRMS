@@ -43,7 +43,6 @@ router.post("/employee", async (req, res) => {
             throw { message: "Invalid password entered" };
         }
 
-        //create user token 
         delete fetchedUser.password;
         const tokenData = {
             id:fetchedUser._id,
@@ -52,8 +51,7 @@ router.post("/employee", async (req, res) => {
 
         const accessToken = createAccessToken(tokenData);
         const refreshToken = createRefreshToken(tokenData);
-
-        //assign user token 
+ 
 
         tokens = { "accessToken": accessToken, "refreshToken": refreshToken };
 

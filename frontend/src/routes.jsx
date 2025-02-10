@@ -1,9 +1,13 @@
 import { createBrowserRouter } from "react-router-dom";
-import Login from "./EmployeePanel/Login/Login.jsx";
 import React, { Suspense,lazy } from "react";
-import UserManagement from "./EmployeePanel/Employees/EmployeesList.jsx";
-import History from "./EmployeePanel/EmployeeLeaves.jsx/History.jsx";
+import PayrollScreen from "./EmployeePanel/PayrollCreate.jsx";
+import PayrollDashboard from "./EmployeePanel/SelfPayroll.jsx";
 
+const AttendanceScreen = lazy(() => import("./EmployeePanel/AttendanceScreen.jsx"));
+const Login = lazy(() => import("./EmployeePanel/Login/Login.jsx"));
+
+const UserManagement = lazy(() => import("./EmployeePanel/Employees/EmployeesList.jsx"));
+const History = lazy(() => import("./EmployeePanel/EmployeeLeaves.jsx/History.jsx"));
 
 const EmployeeProfile = lazy(() => import("./EmployeePanel/EmployeeRegistration.jsx"));
 const EmployeeDashboard = lazy(() => import("./app.jsx"));
@@ -45,6 +49,12 @@ const router = createBrowserRouter([
       { path: "leave", element: <SuspenseWrapper><TakeLeave /></SuspenseWrapper> },
       { path: "employees", element: <SuspenseWrapper><UserManagement /></SuspenseWrapper> },
       { path: "employeesLeaves", element: <SuspenseWrapper><History /></SuspenseWrapper> },
+      { path: "attendance", element: <SuspenseWrapper><AttendanceScreen /></SuspenseWrapper> },
+      { path: "employee-payroll", element: <SuspenseWrapper><PayrollScreen /></SuspenseWrapper> },
+      { path: "payroll", element: <SuspenseWrapper><PayrollDashboard /></SuspenseWrapper> },
+
+
+
 
 
     ],

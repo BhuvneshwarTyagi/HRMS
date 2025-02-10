@@ -1,18 +1,11 @@
-import React, { useState, useContext, useEffect } from 'react';
-import axios from 'axios';
-import { toast } from 'react-toastify';
+import React, { useState, useEffect } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
-import AuthContext from '../../../Context/AuthContext';
-import { BASE_URL } from '../../../Config';
 import { motion } from 'framer-motion';
-import { MdCheck, MdCancel, MdEdit, MdDeleteForever, MdExpandMore, MdExpandLess } from 'react-icons/md';
+import { MdExpandMore, MdExpandLess } from 'react-icons/md';
 
 
 export default function HistoryTile({ details }) {
     const [data, setData] = useState([]);
-    const [editRowIndex, setEditRowIndex] = useState(null);
-    const { authState } = useContext(AuthContext);
-    const [editData, setEditData] = useState({});
     const [expanded, setExpanded] = useState(null);
 
     const handleClick = (index) => {
@@ -28,88 +21,8 @@ export default function HistoryTile({ details }) {
         }
     }, [details]);
 
-    const handleDelete = async (index) => {
-        const id = data[index]._id;
-        const session = getCurrentSession();
-        console.log(id, session, authState.accessToken);
-        if ((data[index].status) === "Pending") {
-            try {
-                const response = await axios.delete(
-                    `${BASE_URL}/leave/delete?leaveId=${id}&session=${session}`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${authState.accessToken}`
-                        }
-                    }
-                );
-
-                if (response.status === 200) {
-                    const updatedData = data.filter((_, i) => i !== index);
-                    setData(updatedData);
-                    console.log('succeess')
-                    toast.success('Leave Deleted');
-                }
-            } catch (err) {
-                toast.error(err.response.data.error);
-            }
-        } else {
-            toast.error('Cannot delete leave that is not pending');
-        }
-    };
-
-    const handleEditClick = (index) => {
-        setEditRowIndex(index);
-        setEditData(data[index]);
-    };
-
-    const handleInputChange = (e, field) => {
-        setEditData({ ...editData, [field]: e.target.value });
-    };
-
-    function getCurrentSession() {
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        const currentMonth = now.getMonth();
-
-        if (currentMonth >= 3) {
-            return `${currentYear}-${(currentYear + 1).toString().slice(-2)}`;
-        } else {
-            return `${currentYear - 1}-${currentYear.toString().slice(-2)}`;
-        }
-    }
 
 
-    const handleUpdate = async (index) => {
-        const id = data[index]._id;
-        const session = getCurrentSession();
-        console.log(id, session, editData);
-
-        try {
-            const response = await axios.put(
-                `${BASE_URL}/leave/update?leaveId=${id}&session=${session}`,
-                editData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${authState.accessToken}`
-                    }
-                }
-            );
-
-            if (response.status === 200) {
-                const updatedData = data.map((item, i) => (i === index ? editData : item));
-                setData(updatedData);
-                setEditRowIndex(null);
-                toast.success('Leave Updated');
-            }
-        } catch (err) {
-            toast.error(err.response.data.error);
-        }
-    };
-
-    const handleCancelEdit = () => {
-        setEditRowIndex(null);
-        setEditData([]);
-    };
 
     return (
         <motion.div
@@ -128,17 +41,11 @@ export default function HistoryTile({ details }) {
                     transition={{ delay: index * 0.1 }}
                     className="mb-4 border border-blue-200 shadow-lg rounded-lg p-4 bg-white"
                 >
-                    <div className='flex justify-between items-center font-medium text-blue-700 cursor-pointer' onClick={() => handleClick(index)}>
-                        <span>Type: {editRowIndex === index ? (
-                            <input
-                                type="text"
-                                value={editData.type}
-                                onChange={(e) => handleInputChange(e, 'type')}
-                                className='border border-blue-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500'
-                            />
-                        ) : (
-                            item.type
-                        )}</span>
+
+                    <div className='flex justify-between gap-2 items-center font-medium text-blue-700 cursor-pointer' onClick={() => handleClick(index)}>
+                        <span>Type:&nbsp;
+                            {item.type}
+                        </span>
                         <motion.div
                             animate={{ rotate: expanded === index ? 180 : 0 }}
                             transition={{ duration: 0.3 }}
@@ -154,16 +61,9 @@ export default function HistoryTile({ details }) {
                         className='overflow-hidden'
                     >
                         <div className='font-medium text-justify mt-2'>
-                            Reason: {editRowIndex === index ? (
-                                <textarea
-                                    rows={6}
-                                    value={editData.reason}
-                                    onChange={(e) => handleInputChange(e, 'reason')}
-                                    className='border border-blue-300 rounded w-full p-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
-                                />
-                            ) : (
-                                <span className='font-normal text-gray-700'>{item.reason}</span>
-                            )}
+                            Reason: &nbsp;
+                            <span className='font-normal text-gray-700'>{item.reason}</span>
+
                         </div>
                     </motion.div>
 
@@ -182,20 +82,8 @@ export default function HistoryTile({ details }) {
                                 </div>
                             </>
                         ) : (
-                            <div className="flex justify-between items-center w-full">
-                                <div className='flex space-x-2'>
-                                    {editRowIndex === index ? (
-                                        <>
-                                            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className='bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg shadow-md' onClick={() => handleUpdate(index)}><MdCheck size={20} /></motion.button>
-                                            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className='bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-lg shadow-md' onClick={handleCancelEdit}><MdCancel size={20} /></motion.button>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className='bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg shadow-md flex items-center' onClick={() => handleEditClick(index)}><MdEdit size={20} /></motion.button>
-                                            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className='bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg shadow-md flex items-center' onClick={() => handleDelete(index)}><MdDeleteForever size={20} /></motion.button>
-                                        </>
-                                    )}
-                                </div>
+                            <div className="flex justify-end items-center w-full">
+
                                 <div className={`font-medium text-sm px-3 py-1 rounded-full ${item.status === 'Pending' ? 'bg-yellow-200 text-yellow-700' :
                                     item.status === 'Approved' ? 'bg-green-200 text-green-700' :
                                         'bg-red-200 text-red-700'
@@ -209,29 +97,14 @@ export default function HistoryTile({ details }) {
                     <div className='w-full mobile:max-tablet:text-xs flex items-center justify-between mt-2 text-blue-600'>
 
                         <div>
-                            From: {editRowIndex === index ? (
-                                <input
-                                    type="date"
-                                    value={editData.startDate}
-                                    onChange={(e) => handleInputChange(e, 'startDate')}
-                                    className='border border-blue-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500'
-                                />
-                            ) : (
-                                item.startDate
-                            )}
+                            From: &nbsp; {item.startDate}
+
                         </div>
 
                         <div>
-                            To: {editRowIndex === index ? (
-                                <input
-                                    type="date"
-                                    value={editData.endDate}
-                                    onChange={(e) => handleInputChange(e, 'endDate')}
-                                    className='border border-blue-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500'
-                                />
-                            ) : (
-                                item.endDate
-                            )}
+                            To: &nbsp;
+                            {item.endDate}
+
                         </div>
                     </div>
                 </motion.div>

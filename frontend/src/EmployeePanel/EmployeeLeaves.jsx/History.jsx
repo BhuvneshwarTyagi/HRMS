@@ -117,7 +117,7 @@ function History() {
                 transition={{ delay: 0.2 }}
             >
 
-                <h1 className='text-3xl px-2 mobile:max-tablet:text-lg font-medium text-black flex items-center'>
+                <h1 className='text-3xl mobile:max-tablet:text-lg font-medium text-black flex items-center'>
 
                     <FaHistory className="mr-2" />
                     Leave History

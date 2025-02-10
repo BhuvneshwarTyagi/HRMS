@@ -13,17 +13,14 @@ const limiter = rateLimit({
     message: 'Too many requests from this IP, please try again later.'
 });
 
- // Trust first proxy
 app.use(limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// routes import
 
 const routes = require("./Routes/index");
 
 
-// Routes use
 app.use("", routes);
 
 

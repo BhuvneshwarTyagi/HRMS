@@ -1,7 +1,4 @@
 const bcrypt=require("bcrypt");
-const e = require("cors");
-
-//const bcrypt = require('bcrypt');
 
 const hashdata = async (data, saltRounds = 10) => {
     try {

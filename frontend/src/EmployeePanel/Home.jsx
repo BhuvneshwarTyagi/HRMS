@@ -31,8 +31,8 @@ const UserProfile = () => {
         <div className="bg-white  shadow-2xl rounded-3xl overflow-hidden">
           <div className="px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-600">
             <div className="text-center flex items-center gap-4">
-              <div className="inline-block p-4 rounded-full bg-white shadow-lg mb-4">
-                <img className="text-5xl text-blue-500" alt='img' src={`${userDetails.profile_picture}`} />
+              <div className="flex items-center justify-center  rounded-full bg-white p-[1px] shadow-lg ">
+                <img className="text-5xl text-blue-500 rounded-full h-16 w-16" alt='img' src={`${userDetails.profile_picture}`} />
               </div>
               <div className="flex flex-col items-start">
                 <h2 className="text-3xl font-bold text-white">{userDetails.Name}</h2>
@@ -42,7 +42,7 @@ const UserProfile = () => {
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-3 md:grid-cols-2 gap-6 p-8">
+          <div className="grid grid-cols-1 tablet:grid-cols-2 laptop:grid-cols-4 gap-6 p-8">
             <DetailItem
               icon={<FaEnvelope />}
               label="Email"

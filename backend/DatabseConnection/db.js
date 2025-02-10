@@ -1,5 +1,5 @@
 const mongoose=require("mongoose");
-//url
+
 const {MONODBB_URI} = require("./../env") ;
 const connectToDB =async()=>{
     try {
