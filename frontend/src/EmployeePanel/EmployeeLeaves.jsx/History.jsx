@@ -1,14 +1,14 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
-import { BASE_URL } from './../../../Config';
-import AuthContext from '../../../Context/AuthContext';
+import { BASE_URL } from './../../Config';
+import AuthContext from '../../Context/AuthContext';
 import axios from 'axios';
-import Loading from '../../../LoadingScreen/Loading'
+import Loading from '../../LoadingScreen/Loading'
 import { toast } from 'react-toastify';
 import HistoryTile from './HistoryTile';
 import { motion } from 'framer-motion';
 import { FaHistory } from 'react-icons/fa';
 
-function History({ additionalData }) {
+function History() {
     const { authState } = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
     const [details, setDetails] = useState([]);
@@ -17,13 +17,7 @@ function History({ additionalData }) {
     const [allDataFetched, setAllDataFetched] = useState(false);
     const sentinelRef = useRef(null);
 
-    useEffect(() => {
-        if (authState.accessToken) {
-            setDetails(prevState => [...additionalData, ...prevState]);
-        } else {
-            toast.error('No access token available');
-        }
-    }, [authState.accessToken, additionalData]);
+
 
     function getCurrentSession() {
         const now = new Date();
@@ -49,11 +43,6 @@ function History({ additionalData }) {
         }
     };
 
-    // useEffect(() => {
-    //     if (start !== 0) {
-    //         fetchLeaves();
-    //     }
-    // }, [start]);
 
     const fetchLeaves = async () => {
         const session = getCurrentSession();
@@ -62,7 +51,7 @@ function History({ additionalData }) {
         setLoading(true);
         console.log('start', start, 'end', end)
         try {
-            const response = await axios.get(`${BASE_URL}/leave/fetch/leave?start=${start}&end=${end}&session=${session}`, {
+            const response = await axios.get(`${BASE_URL}/leave/fetch/employee/leaves?start=${start}&end=${end}&session=${session}`, {
                 headers: {
                     'Authorization': `Bearer ${authState.accessToken}`
                 }

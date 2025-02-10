@@ -62,6 +62,7 @@ const checkHr = (req, res, next) => {
   try {
     const decodedToken = verifyAccessToken(req.token);
     if (decodedToken.valid && decodedToken.decoded.designation === "HR") {
+      req.id = decodedToken.decoded.id;
       delete req.token;
       next();
     } else {
@@ -76,6 +77,7 @@ const checkEmployee = (req, res, next) => {
   try {
     const decodedToken = verifyAccessToken(req.token);
     if (decodedToken.valid && decodedToken.decoded.designation === "Employee") {
+      req.id = decodedToken.decoded.id;
       delete req.token;
       next();
     } else {
@@ -90,6 +92,7 @@ const check = (req, res, next) => {
   try {
     const decodedToken = verifyAccessToken(req.token);
     if (decodedToken.valid) {
+      req.id = decodedToken.decoded.id;
       delete req.token;
       next();
     } else {

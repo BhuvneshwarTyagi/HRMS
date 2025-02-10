@@ -2,8 +2,8 @@ import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import AuthContext from '../../../Context/AuthContext';
-import { BASE_URL } from '../../../Config';
+import AuthContext from '../../Context/AuthContext';
+import { BASE_URL } from '../../Config';
 import { motion } from 'framer-motion';
 import { MdCheck, MdCancel, MdEdit, MdDeleteForever, MdExpandMore, MdExpandLess } from 'react-icons/md';
 
@@ -79,15 +79,14 @@ export default function HistoryTile({ details }) {
     }
 
 
-    const handleUpdate = async (index) => {
+    const handleUpdate = async (index,status) => {
         const id = data[index]._id;
-        const session = getCurrentSession();
-        console.log(id, session, editData);
+
 
         try {
             const response = await axios.put(
-                `${BASE_URL}/leave/update?leaveId=${id}&session=${session}`,
-                editData,
+                `${BASE_URL}/leave/update?leaveId=${id}`,
+                {status},
                 {
                     headers: {
                         Authorization: `Bearer ${authState.accessToken}`
@@ -196,6 +195,12 @@ export default function HistoryTile({ details }) {
                                         </>
                                     )}
                                 </div>
+                                <button onClick={()=>{handleUpdate(index,'Approved')}} className='bg-green-400'>
+                                    Approve
+                                </button>
+                                <button onClick={()=>{handleUpdate(index,'Rejected')}} className='bg-red-400'>
+                                    Reject
+                                </button>
                                 <div className={`font-medium text-sm px-3 py-1 rounded-full ${item.status === 'Pending' ? 'bg-yellow-200 text-yellow-700' :
                                     item.status === 'Approved' ? 'bg-green-200 text-green-700' :
                                         'bg-red-200 text-red-700'

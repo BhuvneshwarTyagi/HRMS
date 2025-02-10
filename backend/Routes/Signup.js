@@ -7,34 +7,35 @@ const { hashdata } = require("../utils/hashData");
 router.post("/employee",extractToken,checkHr, async (req, res) => {
   try {
     let {
-      Name,
+      name,
       contact,
       email,
-      Aadhaar,
-      PAN,
+      aadhaar,
+      pan,
       bank_details,
       emergency_contact,
       address,
       profile_picture,
-      HR
+      isHR
     } = req.body;
 
-    console.log(req.body);
     if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
       throw { message: "Invalid email entered" };
     }
-    password = await hashdata(Aadhaar);
+    password = await hashdata(aadhaar,10);
+    console.log(req.body);
+
     const newUser = new EmployeeModel({
-        Name,
+        Name: name,
         contact,
         email,
-        Aadhaar,
-        PAN,
+        Aadhaar : aadhaar,
+        PAN: pan,
         bank_details,
         emergency_contact,
         address,
         profile_picture,
-        HR,
+        HR: isHR,
         password
     });
 

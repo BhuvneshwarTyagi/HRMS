@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import Progress from './utils/Progress'
 import History from './utils/History'
 import NewLeave from './utils/NewLeave'
 import { ToastContainer } from 'react-toastify';
@@ -59,9 +58,7 @@ function TakeLeave() {
                 </motion.button>
             </motion.div>
 
-            <motion.div className='w-full mb-8 mobile:max-tablet:mb-2' variants={itemVariants}>
-                <Progress />
-            </motion.div>
+ 
 
 
             <History additionalData={additionalData} />

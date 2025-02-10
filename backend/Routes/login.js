@@ -46,7 +46,7 @@ router.post("/employee", async (req, res) => {
         //create user token 
         delete fetchedUser.password;
         const tokenData = {
-            email,
+            id:fetchedUser._id,
             designation: fetchedUser.HR ?  "HR" : "Employee",
         };
 

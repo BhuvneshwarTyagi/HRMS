@@ -1,7 +1,9 @@
 import { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import logo from '../../assets/HRMS.png'
+import themeImg  from '../../assets/login_page.png'
+
 import axios from 'axios';
 import AuthContext from "../../Context/AuthContext";
 import Loading from "../../LoadingScreen/Loading"
@@ -12,16 +14,13 @@ import { BASE_URL } from "../../Config";
 export default function RightCard() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [role, setRole] = useState('');
-    const [error, setError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const { login } = useContext(AuthContext);
+    const { login, checkAuthState } = useContext(AuthContext);
 
-    const handleRoleChange = (event) => {
-        setRole(event.target.value);
-    };
+
+
     const handlePasswordChange = (event) => {
         setPassword(event.target.value);
     };
@@ -32,105 +31,88 @@ export default function RightCard() {
         setShowPassword(!showPassword);
     };
 
-    const handleSubmit = async () => {
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
         setIsSubmitting(true);
         try {
-            const endpoint = role === "Department-Dashboard" ? "/login/staff" : "/login/student";
-            await axios.post(`${BASE_URL}${endpoint}`, {
+            
+            const response = await axios.post(`${BASE_URL}/login/employee`, {
                 email,
-                password
-            }).then((response) => {
-                if (response.status == 200) {
-                    console.log(response.data,"isuhgaoiud hfguj dsfkgj")
-                    const { userDetails, tokens, } = response.data;
-                    console.log(userDetails, tokens);
-
-
-                    login(userDetails, tokens);
-                    navigate(`/${role}`);
-                }
+                password,
             });
 
-        }
-        catch (error) {
-            console.log(error);
-            const errorMessage = error.response?.data?.error || 'An error occured'
-            setError(errorMessage);
+            if (response.status === 200) {
+                const { userDetails, tokens } = response.data;
+                toast.success('Login Successful');
+                login({ ...userDetails }, tokens);
+                navigate(`/home`);
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.error || 'An error occurred';
             toast.error(errorMessage);
-        }
-        finally {
+        } finally {
             setIsSubmitting(false);
         }
-    }
+    };
+
     return (
-        <div className="flex flex-col bg-white rounded-2xl shadow-lg tablet:w-fit tablet:px-10 mobile:w-full mobile:px-7 mobile:max-tablet:mt-10 justify-center">
+        <div className="bg-white h-fit max-w-md md:max-w-md w-full rounded-3xl shadow-lg shadow-primary ">
             <ToastContainer />
-            <img src={logo} alt="img" className="mr-4 h-28 self-center" />
-
-            <h1 className="tablet:text-2xl mobile:text-2xl font-bold self-center whitespace-nowrap">Welcome Back</h1>
-            <h1 className="text-lg mt-2 text-gray-400">Please Enter Your ID & Password</h1>
-
-            {/* {error && <div className="text-red-500 text-center mt-2">{error}</div>} */}
-            <h1 className="text-xl font-bold mt-3 ">Login Id</h1>
-
-            <input
-                type="email"
-                id="email"
-                name="email"
-                value={email}
-                onChange={handleEmailChange}
-                placeholder="Enter your email"
-                className=" rounded-lg shadow-md px-3 py-2 border-2 border-gray-500 mt-2 text-lg "
-                disabled={isSubmitting}
-            />
-
-            <h1 className="text-xl font-bold mt-3">Password</h1>
-            <div className="relative">
-                <input
-                    type={showPassword ? 'text' : 'password'}
-                    id="password"
-                    name="password"
-                    value={password}
-                    onChange={handlePasswordChange}
-                    placeholder="Enter your password"
-                    className="rounded-lg shadow-md px-3 py-2 border-2 border-gray-500 mt-2 text-lg pr-10"
-                    disabled={isSubmitting}
-                />
-                <button
-                    type="button"
-                    onClick={togglePasswordVisibility}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                    disabled={isSubmitting}
-                >
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
+            <div className="w-full h-32 bg-text_blue text-white px-6 flex justify-between items-center rounded-t-3xl">
+                <div className="relative py-4">
+                    <p className="text-xl tablet:text-2xl font-medium leading-tight">Welcome Back!</p>
+                    <img src={logo} alt="Logo" className="w-20 h-20 mt-2 bg-white rounded-full absolute border-4 border-primary border-opacity-5" />
+                </div>
+                <img src={themeImg} alt="log in" className="h-16 tablet:h-32" />
             </div>
-            <Link to='/resetpassword' className="w-fit mt-2">
-                <h1 className=" text-lg text-blue-600">Forgot Password?</h1>
-            </Link>
 
-            <div className="flex w-full   mt-2 text-lg justify-between">
-                    <select
-                        name="role"
-                        value={role}
-                        onChange={handleRoleChange}
-                        className="w-full p-2 border rounded"
+            <div className="w-full mt-10 px-4 text-lg text-black pb-4">
+                <form className="w-full text-lg" onSubmit={handleSubmit}>
+                    <label htmlFor="email" className="block mb-1">Email</label>
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={handleEmailChange}
                         disabled={isSubmitting}
-                    >
-                        <option value="">Select Role</option>
-                        <option value="Department-Dashboard">Staff</option>
-                        <option value="Student-Dashboard">Student</option>
+                        className="w-full border border-text_blue rounded-xl py-2 px-3 shadow-md shadow-primary bg-transparent"
+                        required
+                    />
 
-                    </select>
+                    <label htmlFor="password" className="block mt-4 mb-1">Password</label>
+                    <div className="flex items-center border border-text_blue rounded-xl shadow-md shadow-primary bg-transparent">
+                        <input
+                            type={showPassword ? 'text' : 'password'}
+                            id="password"
+                            value={password}
+                            onChange={handlePasswordChange}
+                            placeholder="Enter password"
+                            disabled={isSubmitting}
+                            className="w-full py-2 px-3 bg-transparent rounded-l-xl outline-none"
+                            required
+                        />
+                        <button
+                            type="button"
+                            onClick={togglePasswordVisibility}
+                            className="p-2 text-gray-500"
+                            disabled={isSubmitting}
+                        >
+                            {showPassword ? <FaEyeSlash /> : <FaEye />}
+                        </button>
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full mt-4 py-2 bg-blue-300 rounded-xl shadow-md border border-primary"
+                    >
+                        {isSubmitting ? <Loading /> : <p className="text-primary font-medium mx-auto">Log in</p>}
+                    </button>
+                </form>
+
 
             </div>
-
-
-            <button className="flex w-64 shadow-md rounded-2xl py-2 mb-4 mt-2 justify-center self-center  bg-blue-600" onClick={handleSubmit} disabled={isSubmitting}>
-
-                {isSubmitting ? <Loading /> : <h1 className="font-medium text-2xl text-white">Login</h1>}
-
-            </button>
         </div>
-    )
+    );
 }

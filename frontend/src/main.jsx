@@ -1,17 +1,15 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import router from "./routes.jsx";
-import "./index.css";
-import { RouterProvider } from "react-router-dom";
-import { AuthProvider } from "./Context/AuthContext.jsx";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { RouterProvider } from 'react-router-dom';
+import { AuthProvider } from './Context/AuthContext';
+import router from './routes';
+import './index.css';
+import 'react-toastify/dist/ReactToastify.css';
 
-
-
-ReactDOM.createRoot(document.getElementById("root")).render(
+ReactDOM.createRoot(document.getElementById('root')).render(
   <AuthProvider>
-    <RouterProvider router={router} />
+
+      <RouterProvider router={router} />
+
   </AuthProvider>
 );
-
-
-
