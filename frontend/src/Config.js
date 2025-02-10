@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = 'https://hrms-733x.onrender.com';
 
 
 // https://face-prediction.onrender.com/predict
