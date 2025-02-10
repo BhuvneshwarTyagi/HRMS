@@ -1,15 +1,17 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../Config';
 import AuthContext from '../Context/AuthContext';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FiUsers,FiDownload } from 'react-icons/fi';
+import debounce from 'lodash.debounce';
 
 const PayrollScreen = () => {
     const { authState } = useContext(AuthContext);
     const [payrollData, setPayrollData] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [employeeSearchResults, setEmployeeSearchResults] = useState([]);
     const [formData, setFormData] = useState({
         employeeId: '',
         baseSalary: '',
@@ -98,6 +100,46 @@ const PayrollScreen = () => {
           setLoading(false);
         }
       };
+
+
+      const debouncedEmployeeSearch = useCallback(
+        debounce(async (searchString) => {
+            if (!searchString) {
+                setEmployeeSearchResults([]);
+                return;
+            }
+
+            try {
+                const response = await axios.get(`${BASE_URL}/searchuser/${searchString}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authState.accessToken}`,
+                    },
+                });
+                setEmployeeSearchResults(response.data.employees);
+            } catch (error) {
+                toast.error('Failed to search employees');
+                setEmployeeSearchResults([]);
+            }
+        }, 300),
+        [authState.accessToken]
+    );
+      const handleEmployeeIdChange = (e) => {
+        const value = e.target.value;
+        setFormData({
+            ...formData,
+            employeeId: value,
+        });
+        debouncedEmployeeSearch(value);
+    };
+
+
+      const handleEmployeeSelect = (employee) => {
+        setFormData({
+            ...formData,
+            employeeId: employee._id,
+        });
+        setEmployeeSearchResults([]);
+    };
     return (
         <div className="min-h-screen ">
             <ToastContainer />
@@ -114,19 +156,33 @@ const PayrollScreen = () => {
                     </h2>
 
                     <form onSubmit={handleSubmit} className="grid laptop:grid-cols-4 tablet:grid-cols-2 mobile:max-tablet:grid-cols-1 gap-6">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Employee ID
-                            </label>
-                            <input
-                                type="text"
-                                name="employeeId"
-                                value={formData.employeeId}
-                                onChange={handleInputChange}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                                required
-                            />
-                        </div>
+                    <div className="relative">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Employee ID
+                        </label>
+                        <input
+                            type="text"
+                            name="employeeId"
+                            value={formData.employeeId}
+                            onChange={handleEmployeeIdChange}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                            required
+                            autoComplete="off"
+                        />
+                        {employeeSearchResults.length > 0 && (
+                            <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                                {employeeSearchResults.map((employee) => (
+                                    <div
+                                        key={employee._id}
+                                        onClick={() => handleEmployeeSelect(employee)}
+                                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                    >
+                                        {employee.Name}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
