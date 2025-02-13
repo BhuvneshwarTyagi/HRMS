@@ -1,8 +1,8 @@
 import { createBrowserRouter } from "react-router-dom";
 import React, { Suspense,lazy } from "react";
 
-const PayrollScreen = lazy(() => import("./EmployeePanel/PayrollCreate.jsx"));
-const PayrollDashboard = lazy(() => import("./EmployeePanel/SelfPayroll.jsx"));
+const PayrollScreen = lazy(() => import("./EmployeePanel/Payroll/PayrollCreate.jsx"));
+const PayrollDashboard = lazy(() => import("./EmployeePanel/Payroll/SelfPayroll.jsx"));
 
 const AttendanceScreen = lazy(() => import("./EmployeePanel/AttendanceScreen.jsx"));
 const Login = lazy(() => import("./EmployeePanel/Login/Login.jsx"));

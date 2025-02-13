@@ -4,8 +4,9 @@ import AuthContext from '../../../Context/AuthContext';
 import axios from 'axios';
 import Loading from '../../../LoadingScreen/Loading'
 import { toast } from 'react-toastify';
-import HistoryTile from './HistoryTile';
+
 import { motion } from 'framer-motion';
+import HistoryTile from '../../EmployeeLeaves.jsx/HistoryTile';
 
 function History({ additionalData }) {
     const { authState } = useContext(AuthContext);
@@ -131,7 +132,7 @@ function History({ additionalData }) {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <HistoryTile details={details} />
+                        <HistoryTile details={details} self={true} />
                     </motion.div>
 
                     <div ref={sentinelRef} className="h-10">

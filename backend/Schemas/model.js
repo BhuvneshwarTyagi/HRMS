@@ -35,6 +35,7 @@ const EmployeeCheckSchema = new mongoose.Schema({
     ref: "Employee",
     required: true,
   },
+  date: String,
   checkInTime: {
     type: Date,
     default: Date.now,

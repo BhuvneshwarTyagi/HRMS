@@ -44,9 +44,9 @@ export default function Navbar({ onDrawerToggle }) {
                         >
                             <span className="flex items-center gap-2 font-medium">
                             <div className="flex items-center justify-center  rounded-full bg-white p-[1px] shadow-lg ">
-                                    <img className="text-5xl text-blue-500 rounded-full h-10 w-10" alt='img' src={`${authState.userDetails.profile_picture}`} />
+                                    <img className="text-5xl text-blue-500 rounded-full h-10 w-10" alt='img' src={authState?.userDetails?.profile_picture || 'default-profile.png'} />
                                 </div>
-                                {authState.userDetails.Name}
+                                {authState?.userDetails?.Name || 'User'}
                                 
                             </span>
                         </button>

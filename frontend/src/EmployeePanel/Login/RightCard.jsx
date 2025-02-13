@@ -17,7 +17,7 @@ export default function RightCard() {
     const [showPassword, setShowPassword] = useState(false);
     // const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const { login, checkAuthState } = useContext(AuthContext);
+    const { login } = useContext(AuthContext);
 
 
 
@@ -50,6 +50,7 @@ export default function RightCard() {
             }
         } catch (error) {
             const errorMessage = error.response?.data?.error || 'An error occurred';
+            console.log(error);
             toast.error(errorMessage);
         } finally {
             setIsSubmitting(false);

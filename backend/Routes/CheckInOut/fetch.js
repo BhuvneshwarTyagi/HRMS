@@ -24,9 +24,7 @@ router.get("", extractToken, check, async (req, res) => {
 
     ).sort({ checkInTime: -1 });
 
-    if (records.length === 0) {
-      return res.status(404).json({ message: "No records found for the given date." });
-    }
+
 
     res.status(200).json({ message: "Records fetched successfully!", data: records });
   } catch (error) {

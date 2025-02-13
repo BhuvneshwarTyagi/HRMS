@@ -7,13 +7,12 @@ const PDFKit = require("pdfkit");
 
 router.get("", extractToken, check, async (req, res) => {
   try {
-    const { month } = req.query;
     const employeeId = req.id;
-    if (!employeeId || !month) {
+    if (!employeeId ) {
       return res.status(400).json({ message: "employeeId and month are required!" });
     }
 
-    const payrollRecord = await Payroll.findOne({ employeeId, month }).populate('employeeId', 'Name');
+    const payrollRecord = await Payroll.find({ employeeId }).populate('employeeId', 'Name').sort({month:-1});
 
     if (!payrollRecord) {
       return res.status(404).json({ message: "Payroll record not found!" });
@@ -28,7 +27,7 @@ router.get("", extractToken, check, async (req, res) => {
 router.get("/employee", extractToken, checkHr, async (req, res) => {
   try {
 
-    const payrollRecord = await Payroll.find({}).populate('employeeId', 'Name');
+    const payrollRecord = await Payroll.find({}).populate('employeeId', 'Name').sort({month:-1,"employeeId.Name":1});
 
     if (!payrollRecord) {
       return res.status(404).json({ message: "Payroll record not found!" });

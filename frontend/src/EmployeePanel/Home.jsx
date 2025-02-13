@@ -5,10 +5,10 @@ import AuthContext from '../Context/AuthContext';
 const UserProfile = () => {
   // Mock data based on the provided schema
   const { authState } = useContext(AuthContext);
-  const userDetails = authState.userDetails;
+  const userDetails = authState?.userDetails;
 
   const DetailItem = ({ icon, label, value }) => (
-    <div className="flex items-center p-3 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+    <div className="flex items-center p-3 bg-white rounded-lg shadow-md border hover:shadow-lg transition-shadow duration-300">
       <div className="text-2xl text-blue-500 mr-4">{icon}</div>
       <div>
         <h3 className="text-sm font-semibold text-gray-600">{label}</h3>
@@ -18,67 +18,67 @@ const UserProfile = () => {
   );
 
   return (
-    <div className="h-fit w-full px-4 sm:px-6 lg:px-8 py-10">
+    <div className="h-fit w-full py-10">
       <div className="w-full mx-auto">
         <div className="w-full text-center mb-4">
           <h1 className="text-2xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
             Employee Profile
           </h1>
           <p className="mt-3 text-xl text-gray-600">
-            Detailed information about {userDetails.Name}
+            Detailed information about {userDetails?.Name}
           </p>
         </div>
         <div className="bg-white  shadow-2xl rounded-3xl overflow-hidden">
           <div className="px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-600">
             <div className="text-center flex items-center gap-4">
               <div className="flex items-center justify-center  rounded-full bg-white p-[1px] shadow-lg ">
-                <img className="text-5xl text-blue-500 rounded-full h-16 w-16" alt='img' src={`${userDetails.profile_picture}`} />
+                <img className="text-5xl text-blue-500 rounded-full h-16 w-16" alt='img' src={`${userDetails?.profile_picture}`} />
               </div>
               <div className="flex flex-col items-start">
-                <h2 className="text-3xl font-bold text-white">{userDetails.Name}</h2>
+                <h2 className="text-3xl font-bold text-white">{userDetails?.Name}</h2>
                 <p className="text-blue-100 mt-1">
-                  {userDetails.HR ? "HR Access Granted" : "Employee"}
+                  {userDetails?.HR ? "HR Access Granted" : "Employee"}
                 </p>
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-1 tablet:grid-cols-2 laptop:grid-cols-4 gap-6 p-8">
+          <div className="grid grid-cols-1 tablet:grid-cols-2 laptop:grid-cols-4 gap-6 mobile:p-2 tablet:p-4">
             <DetailItem
               icon={<FaEnvelope />}
               label="Email"
-              value={userDetails.email}
+              value={userDetails?.email}
             />
             <DetailItem
               icon={<FaPhone />}
               label="Contact"
-              value={userDetails.contact}
+              value={userDetails?.contact}
             />
             <DetailItem
               icon={<FaIdCard />}
               label="Aadhaar"
-              value={userDetails.Aadhaar}
+              value={userDetails?.Aadhaar}
             />
             <DetailItem
               icon={<FaIdCard />}
               label="PAN"
-              value={userDetails.PAN}
+              value={userDetails?.PAN}
             />
             <DetailItem
               icon={<FaMapMarkerAlt />}
               label="Address"
-              value={userDetails.address}
+              value={userDetails?.address}
             />
             <DetailItem
               icon={<FaUniversity />}
               label="Bank Details"
-              value={userDetails.bank_details}
+              value={userDetails?.bank_details}
             />
             <DetailItem
               icon={<FaPhoneVolume />}
               label="Emergency Contact"
-              value={userDetails.emergency_contact}
+              value={userDetails?.emergency_contact}
             />
-            {userDetails.HR && (
+            {userDetails?.HR && (
               <DetailItem
                 icon={<FaBriefcase />}
                 label="Role"

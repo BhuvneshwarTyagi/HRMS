@@ -23,7 +23,7 @@ export default function StaffDrawer({ isOpen }) {
 
                         (menuItem.title === "View All Employees" || menuItem.title === "View Employees Leaves" || menuItem.title === "Register New Employee" || menuItem.title === "Employee Payroll")
                             ?
-                            authState.userDetails.HR && 
+                            (authState?.userDetails?.HR || false) && 
                             <div
                                 key={index}
                                 onClick={() => handleClick(index)}
@@ -36,7 +36,7 @@ export default function StaffDrawer({ isOpen }) {
                                     childrens={menuItem.children}
                                     route={menuItem.route}
                                     active={active}
-                                    key={index}
+                                    key1={index}
                                 />
                             </div>
                             :
@@ -52,7 +52,7 @@ export default function StaffDrawer({ isOpen }) {
                                     childrens={menuItem.children}
                                     route={menuItem.route}
                                     active={active}
-                                    key={index}
+                                    key1={index}
                                 />
                             </div>
                     ))}

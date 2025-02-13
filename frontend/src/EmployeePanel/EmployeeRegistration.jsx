@@ -22,11 +22,10 @@ const SignUpForm = () => {
     bank_details: '',
     address: '',
     isHR: false,
-    profile_picture: null
+    profile_picture: ''
   });
 
   const { authState } = useContext(AuthContext);
-  console.log(authState)
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;

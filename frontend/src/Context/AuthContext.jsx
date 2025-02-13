@@ -51,7 +51,8 @@ export const AuthProvider = ({ children }) => {
                 //console.log(decryptedAuthState, 'decrypt')
                 setAuthState(decryptedAuthState);
                 const currentURL = window.location.href.split('/')[3];
-                if (!currentURL || currentURL != decryptedAuthState.role) {
+                
+                if (!currentURL) {
                     navigate("/dashboard");
                 }
                 setIsLoading(false);

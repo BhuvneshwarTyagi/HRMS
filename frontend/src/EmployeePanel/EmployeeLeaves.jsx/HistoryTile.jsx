@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { MdExpandMore, MdExpandLess } from 'react-icons/md';
 
 
-export default function HistoryTile({ details }) {
+export default function HistoryTile({ details, self }) {
     const [data, setData] = useState([]);
     const [editRowIndex, setEditRowIndex] = useState(null);
     const { authState } = useContext(AuthContext);
@@ -51,8 +51,8 @@ export default function HistoryTile({ details }) {
 
             if (response.status === 200) {
                 const updatedData = data.map((item, i) => {
-                    console.log('item', i === index ? {...item,status:status} : item)
-                    return i === index ? {...item,status:status} : item
+                    console.log('item', i === index ? { ...item, status: status } : item)
+                    return i === index ? { ...item, status: status } : item
                 }
                 );
                 setData(updatedData);
@@ -81,10 +81,18 @@ export default function HistoryTile({ details }) {
                     transition={{ delay: index * 0.1 }}
                     className="mb-4 border border-blue-200 shadow-lg rounded-lg p-4 bg-white"
                 >
-                     <div className='flex flex-row'>
-                        <img src={item.employee.profileLink} alt="img" className='w-6 h-6 bg-blue' />
-                        <span className='font-medium text-black ml-2'>{item.employee.Name}</span>
-                    </div>
+                    {
+                        self ?
+                            <div className='flex flex-row items-center' onClick={() => handleClick(index)}>
+                                <img src={authState?.userDetails?.profile_picture || ""} alt="img" className='w-10 h-10 rounded-full bg-blue' />
+                                <span className='font-medium text-black ml-2'>{authState?.userDetails?.Name || ""}</span>
+                            </div>
+                            :
+                            <div className='flex flex-row items-center' onClick={() => handleClick(index)}>
+                                <img src={item.employee.profile_picture} alt="img" className='w-10 h-10 rounded-full bg-blue' />
+                                <span className='font-medium text-black ml-2'>{item.employee.Name}</span>
+                            </div>
+                    }
                     <div className='flex justify-between items-center font-medium text-blue-700 cursor-pointer' onClick={() => handleClick(index)}>
                         <span>Type: {editRowIndex === index ? (
                             <input
@@ -140,7 +148,7 @@ export default function HistoryTile({ details }) {
                             </>
                         ) : (
                             <div className="flex mobile:max-tablet:flex-col gap-2 justify-between items-center w-full">
-                                <div className='flex space-x-2'>
+                                {!self && <div className='flex space-x-2'>
 
                                     <button onClick={() => { handleUpdate(index, 'Approved') }} className='bg-green-400'>
                                         Approve
@@ -148,7 +156,7 @@ export default function HistoryTile({ details }) {
                                     <button onClick={() => { handleUpdate(index, 'Rejected') }} className='bg-red-400'>
                                         Reject
                                     </button>
-                                </div>
+                                </div>}
 
                                 <div className={`font-medium text-sm px-3 py-1 rounded-full ${item.status === 'Pending' ? 'bg-yellow-200 text-yellow-700' :
                                     item.status === 'Approved' ? 'bg-green-200 text-green-700' :

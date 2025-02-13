@@ -8,11 +8,33 @@ import { motion } from 'framer-motion'; // For animations
 
 const AttendanceScreen = () => {
 
-  const {authState} = useContext(AuthContext);
+  const { authState } = useContext(AuthContext);
   const [attendanceRecords, setAttendanceRecords] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
 
+  const isWithinWorkingHours = () => {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+
+    // Check if time is before 9:30 AM
+    if (hours < 9 || (hours === 9 && minutes < 30)) {
+      toast.error("Attendance can only be marked between working hours");
+      return false;
+    }
+
+    // Check if time is after 6:30 PM
+    if (hours > 18 || (hours === 18 && minutes > 30)) {
+      toast.error("Attendance can only be marked between working hours");
+      return false;
+    }
+
+    return true;
+  };
+
+  const isWorkingHours = isWithinWorkingHours();
 
   useEffect(() => {
     fetchAttendanceRecords();
@@ -21,7 +43,7 @@ const AttendanceScreen = () => {
   const fetchAttendanceRecords = async () => {
     try {
       const today = new Date().toISOString().split('T')[0];
-      const response = await axios.get(BASE_URL+`/attendance/fetch?date=${today}`,
+      const response = await axios.get(BASE_URL + `/attendance/fetch?date=${today}`,
         {
           headers: {
             'Authorization': `Bearer ${authState.accessToken}`,
@@ -38,15 +60,15 @@ const AttendanceScreen = () => {
   const handleCheckIn = async () => {
     try {
       setLoading(true);
-      const response = await axios.post(BASE_URL + '/attendance/create/checkin', {
+      await axios.post(BASE_URL + '/attendance/create/checkin', {
         checkInTime: new Date(),
       },
-      {
-        headers: {
-          'Authorization': `Bearer ${authState.accessToken}`,
-        },
-      }
-    );
+        {
+          headers: {
+            'Authorization': `Bearer ${authState.accessToken}`,
+          },
+        }
+      );
       fetchAttendanceRecords();
       setError('');
     } catch (error) {
@@ -60,15 +82,15 @@ const AttendanceScreen = () => {
   const handleCheckOut = async () => {
     try {
       setLoading(true);
-      const response = await axios.post(BASE_URL + '/attendance/create/checkout', {
+      await axios.post(BASE_URL + '/attendance/create/checkout', {
         checkOutTime: new Date(),
       },
-      {
-        headers: {
-          'Authorization': `Bearer ${authState.accessToken}`,
-        },
-      }
-    );
+        {
+          headers: {
+            'Authorization': `Bearer ${authState.accessToken}`,
+          },
+        }
+      );
       fetchAttendanceRecords();
       setError('');
     } catch (error) {
@@ -85,48 +107,21 @@ const AttendanceScreen = () => {
   };
 
 
-  const getCurrentTime = () => {
-    return new Date().toLocaleTimeString();
-  };
 
-  const [currentTime, setCurrentTime] = useState(getCurrentTime());
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(getCurrentTime());
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="min-h-screen overflow-auto no-scrollbar"
     >
       <ToastContainer />
-      
-      {/* Time Display Card */}
-      <motion.div 
-        initial={{ y: -20 }}
-        animate={{ y: 0 }}
-        className="max-w-4xl mx-auto mb-8 bg-white rounded-2xl shadow-lg p-6"
-      >
-        <div className="flex items-center justify-between mobile:max-tablet:flex-col">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">Attendance Dashboard</h1>
-            <p className="text-gray-600">Track your daily attendance efficiently</p>
-          </div>
-          <div className="text-center">
-            <FiClock className="text-4xl text-indigo-600 mb-2 mx-auto" />
-            <div className="text-2xl font-bold text-indigo-600">{currentTime}</div>
-          </div>
-        </div>
-      </motion.div>
 
+      {/* Time Display Card */}
+
+      <Timer />
       {/* Check-in/Check-out Card */}
-      <motion.div 
+      <motion.div
         initial={{ y: 20 }}
         animate={{ y: 0 }}
         className="max-w-4xl mx-auto mb-8 bg-white rounded-2xl shadow-lg p-6 "
@@ -134,7 +129,7 @@ const AttendanceScreen = () => {
         <div className="grid md:grid-cols-2 gap-4">
           <button
             onClick={handleCheckIn}
-            disabled={loading}
+            disabled={loading || !isWorkingHours}
             className="flex items-center justify-center gap-2 bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50"
           >
             <FiLogIn className="text-xl" />
@@ -142,7 +137,7 @@ const AttendanceScreen = () => {
           </button>
           <button
             onClick={handleCheckOut}
-            disabled={loading}
+            disabled={loading || !isWorkingHours}
             className="flex items-center justify-center gap-2 bg-gradient-to-r from-red-400 to-red-600 hover:from-red-500 hover:to-red-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50"
           >
             <FiLogOut className="text-xl" />
@@ -158,7 +153,7 @@ const AttendanceScreen = () => {
       </motion.div>
 
       {/* Attendance Records Card */}
-      <motion.div 
+      <motion.div
         initial={{ y: 20 }}
         animate={{ y: 0 }}
         className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-2"
@@ -167,7 +162,7 @@ const AttendanceScreen = () => {
           <FiClock className="text-indigo-600" />
           Today's Attendance Records
         </h2>
-        
+
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -180,7 +175,7 @@ const AttendanceScreen = () => {
             </thead>
             <tbody>
               {attendanceRecords.map((record, index) => (
-                <motion.tr 
+                <motion.tr
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
@@ -196,13 +191,12 @@ const AttendanceScreen = () => {
                   </td>
                   <td className="py-3 px-4">
                     <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        record.checkOutTime
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${(record.checkOutTime && record.checkOutTime > record.checkInTime)
                           ? 'bg-green-100 text-green-800'
                           : 'bg-yellow-100 text-yellow-800'
-                      }`}
+                        }`}
                     >
-                      {record.checkOutTime ? 'Completed' : 'Active'}
+                      {(record.checkOutTime && record.checkOutTime > record.checkInTime) ? 'Completed' : 'Active'}
                     </span>
                   </td>
                 </motion.tr>
@@ -225,4 +219,38 @@ const AttendanceScreen = () => {
   );
 };
 
+
+function Timer() {
+  const getCurrentTime = () => {
+    return new Date().toLocaleTimeString();
+  };
+
+  const [currentTime, setCurrentTime] = useState(getCurrentTime());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(getCurrentTime());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+  return (
+    <motion.div
+      initial={{ y: -20 }}
+      animate={{ y: 0 }}
+      className="max-w-4xl mx-auto mb-8 bg-white rounded-2xl shadow-lg p-6"
+    >
+      <div className="flex items-center justify-between mobile:max-tablet:flex-col">
+        <div>
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">Attendance Dashboard</h1>
+          <p className="text-gray-600">Track your daily attendance efficiently</p>
+        </div>
+        <div className="text-center">
+          <FiClock className="text-4xl text-indigo-600 mb-2 mx-auto" />
+          <div className="text-2xl font-bold text-indigo-600">{currentTime}</div>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
 export default AttendanceScreen;
